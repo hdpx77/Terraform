@@ -1,6 +1,6 @@
 variable "region" {
   description = "AWS Region"
-  default     = "us-east-1"
+  default     = "eu-north-1"
 }
 
 variable "vpc_cidr" {
@@ -27,7 +27,7 @@ variable "instance_type" {
 
 variable "ami_id" {
   description = "Amazon Machine Image ID for EC2 instances"
-  default     = "ami-027951e78de46a00e" 
+  default     = "ami-016038ae9cc8d9f51"" 
 }
 
 variable "ssh_ingress_cidr" {
