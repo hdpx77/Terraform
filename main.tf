@@ -46,5 +46,22 @@ ingress {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+resource "aws_instance" "nginx" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.public[0].id
+  security_groups = [aws_security_group.web.name]
+
+  user_data = <<-EOF
+              #!/bin/bash
+              yum install -y nginx
+              systemctl start nginx
+              systemctl enable nginx
+              EOF
+
+  tags = {
+    Name = "Nginx-Instance"
+  }
+}
 
 
