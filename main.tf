@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "var.region"  
+  region = var.region
 }
 
 resource "aws_vpc" "main" {
@@ -10,7 +10,7 @@ resource "aws_subnet" "public" {
  count             = length(var.public_subnets)
   vpc_id           = aws_vpc.main.id
   cidr_block       = var.public_subnets[count.index]
-  availability_zone = element(["us-east-1a", "us-east-1b", "us-east-1c"], count.index)
+  availability_zone = element(["eu-north-1a", "us-east-1b"], count.index)
   map_public_ip_on_launch = true
 }
 
@@ -18,7 +18,7 @@ resource "aws_subnet" "private" {
   count             = length(var.private_subnets)
   vpc_id           = aws_vpc.main.id
   cidr_block       = var.private_subnets[count.index]
-  availability_zone = element(["us-east-1a", "us-east-1b", "us-east-1c"], count.index)
+  availability_zone = element(["eu-north-1a", "eu-north-1b"], count.index)
 }
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -45,12 +45,17 @@ ingress {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+tags = {
+    Name = "my-security-group"
+  }
+
 }
 resource "aws_instance" "nginx" {
+  count          = length(var.public_subnets)
   ami           = var.ami_id
   instance_type = var.instance_type
-  subnet_id     = aws_subnet.public[0].id
-  security_groups = [aws_security_group.web.name]
+  subnet_id     = aws_subnet.public[count.index].id
+  security_groups = [aws_security_group.my_sg.id]
 
   user_data = <<-EOF
               #!/bin/bash
